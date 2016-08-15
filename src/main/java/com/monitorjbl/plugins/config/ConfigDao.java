@@ -25,6 +25,8 @@ public class ConfigDao {
   public static final String BLOCKED_PRS = "blockedPRs";
   public static final String AUTOMERGE_PRS = "automergePRs";
   public static final String AUTOMERGE_PRS_FROM = "automergePRsFrom";
+  public static final String REQUIRED_REVIEW_EXCLUDE = "requiredReviewExclude";
+  public static final String REQUIRED_REVIEW_EXCLUDE_GROUPS = "requiredReviewExcludeGroups";
 
   private final PluginSettingsFactory pluginSettingsFactory;
   private final UserService userService;
@@ -53,17 +55,19 @@ public class ConfigDao {
 
   Config readConfig(PluginSettings settings) {
     return Config.builder()
-        .requiredReviews(parseInt(get(settings, REQUIRED_REVIEWS, null)))
-        .requiredReviewers(split(get(settings, REQUIRED_REVIWERS, "")))
-        .requiredReviewerGroups(split(get(settings, REQUIRED_REVIWER_GROUPS, "")))
-        .defaultReviewers(split(get(settings, DEFAULT_REVIEWERS, "")))
-        .defaultReviewerGroups(split(get(settings, DEFAULT_REVIEWER_GROUPS, "")))
-        .excludedUsers(split(get(settings, EXCLUDED_USERS, "")))
-        .excludedGroups(split(get(settings, EXCLUDED_GROUPS, "")))
-        .blockedCommits(split(get(settings, BLOCKED_COMMITS, "")))
-        .blockedPRs(split(get(settings, BLOCKED_PRS, "")))
-        .automergePRs(split(get(settings, AUTOMERGE_PRS, "")))
-        .automergePRsFrom(split(get(settings, AUTOMERGE_PRS_FROM, "")))
+            .requiredReviews(parseInt(get(settings, REQUIRED_REVIEWS, null)))
+            .requiredReviewers(split(get(settings, REQUIRED_REVIWERS, "")))
+            .requiredReviewerGroups(split(get(settings, REQUIRED_REVIWER_GROUPS, "")))
+            .defaultReviewers(split(get(settings, DEFAULT_REVIEWERS, "")))
+            .defaultReviewerGroups(split(get(settings, DEFAULT_REVIEWER_GROUPS, "")))
+            .excludedUsers(split(get(settings, EXCLUDED_USERS, "")))
+            .excludedGroups(split(get(settings, EXCLUDED_GROUPS, "")))
+            .blockedCommits(split(get(settings, BLOCKED_COMMITS, "")))
+            .blockedPRs(split(get(settings, BLOCKED_PRS, "")))
+            .automergePRs(split(get(settings, AUTOMERGE_PRS, "")))
+            .automergePRsFrom(split(get(settings, AUTOMERGE_PRS_FROM, "")))
+            .requiredReviewExclude(split(get(settings, REQUIRED_REVIEW_EXCLUDE, "")))
+            .requiredReviewExcludeGroups(split(get(settings, REQUIRED_REVIEW_EXCLUDE_GROUPS, "")))
         .build();
   }
 
@@ -80,6 +84,8 @@ public class ConfigDao {
     settings.put(BLOCKED_PRS, empty2null(join(config.getBlockedPRs(), noOpFilter)));
     settings.put(AUTOMERGE_PRS, empty2null(join(config.getAutomergePRs(), noOpFilter)));
     settings.put(AUTOMERGE_PRS_FROM, empty2null(join(config.getAutomergePRsFrom(), noOpFilter)));
+    settings.put(REQUIRED_REVIEW_EXCLUDE, empty2null(join(config.getRequiredReviewExclude(), new FilterInvalidUsers())));
+    settings.put(REQUIRED_REVIEW_EXCLUDE_GROUPS, empty2null(join(config.getRequiredReviewExcludeGroups(), new FilterInvalidGroups())));
   }
 
   /**
@@ -89,17 +95,19 @@ public class ConfigDao {
    */
   Config overlayConfig(Config bottom, Config top) {
     return Config.builder()
-        .requiredReviews(top.getRequiredReviews() != null ? top.getRequiredReviews() : bottom.getRequiredReviews())
-        .requiredReviewers(overlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
-        .requiredReviewerGroups(overlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
-        .defaultReviewers(overlay(bottom.getDefaultReviewers(), top.getDefaultReviewers()))
-        .defaultReviewerGroups(overlay(bottom.getDefaultReviewerGroups(), top.getDefaultReviewerGroups()))
-        .excludedUsers(overlay(bottom.getExcludedUsers(), top.getExcludedUsers()))
-        .excludedGroups(overlay(bottom.getExcludedGroups(), top.getExcludedGroups()))
-        .blockedCommits(overlay(bottom.getBlockedCommits(), top.getBlockedCommits()))
-        .blockedPRs(overlay(bottom.getBlockedPRs(), top.getBlockedPRs()))
-        .automergePRs(overlay(bottom.getAutomergePRs(), top.getAutomergePRs()))
-        .automergePRsFrom(overlay(bottom.getAutomergePRsFrom(), top.getAutomergePRsFrom()))
+            .requiredReviews(top.getRequiredReviews() != null ? top.getRequiredReviews() : bottom.getRequiredReviews())
+            .requiredReviewers(overlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
+            .requiredReviewerGroups(overlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
+            .defaultReviewers(overlay(bottom.getDefaultReviewers(), top.getDefaultReviewers()))
+            .defaultReviewerGroups(overlay(bottom.getDefaultReviewerGroups(), top.getDefaultReviewerGroups()))
+            .excludedUsers(overlay(bottom.getExcludedUsers(), top.getExcludedUsers()))
+            .excludedGroups(overlay(bottom.getExcludedGroups(), top.getExcludedGroups()))
+            .blockedCommits(overlay(bottom.getBlockedCommits(), top.getBlockedCommits()))
+            .blockedPRs(overlay(bottom.getBlockedPRs(), top.getBlockedPRs()))
+            .automergePRs(overlay(bottom.getAutomergePRs(), top.getAutomergePRs()))
+            .automergePRsFrom(overlay(bottom.getAutomergePRsFrom(), top.getAutomergePRsFrom()))
+            .requiredReviewExclude(overlay(bottom.getRequiredReviewExclude(), top.getRequiredReviewExclude()))
+            .requiredReviewExcludeGroups(overlay(bottom.getRequiredReviewExcludeGroups(), top.getRequiredReviewExcludeGroups()))
         .build();
   }
 
@@ -110,17 +118,19 @@ public class ConfigDao {
    */
   Config reverseOverlayConfig(Config bottom, Config top) {
     return Config.builder()
-        .requiredReviews(Objects.equals(top.getRequiredReviews(), bottom.getRequiredReviews()) ? null : top.getRequiredReviews())
-        .requiredReviewers(reverseOverlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
-        .requiredReviewerGroups(reverseOverlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
-        .defaultReviewers(reverseOverlay(bottom.getDefaultReviewers(), top.getDefaultReviewers()))
-        .defaultReviewerGroups(reverseOverlay(bottom.getDefaultReviewerGroups(), top.getDefaultReviewerGroups()))
-        .excludedUsers(reverseOverlay(bottom.getExcludedUsers(), top.getExcludedUsers()))
-        .excludedGroups(reverseOverlay(bottom.getExcludedGroups(), top.getExcludedGroups()))
-        .blockedCommits(reverseOverlay(bottom.getBlockedCommits(), top.getBlockedCommits()))
-        .blockedPRs(reverseOverlay(bottom.getBlockedPRs(), top.getBlockedPRs()))
-        .automergePRs(reverseOverlay(bottom.getAutomergePRs(), top.getAutomergePRs()))
-        .automergePRsFrom(reverseOverlay(bottom.getAutomergePRsFrom(), top.getAutomergePRsFrom()))
+            .requiredReviews(Objects.equals(top.getRequiredReviews(), bottom.getRequiredReviews()) ? null : top.getRequiredReviews())
+            .requiredReviewers(reverseOverlay(bottom.getRequiredReviewers(), top.getRequiredReviewers()))
+            .requiredReviewerGroups(reverseOverlay(bottom.getRequiredReviewerGroups(), top.getRequiredReviewerGroups()))
+            .defaultReviewers(reverseOverlay(bottom.getDefaultReviewers(), top.getDefaultReviewers()))
+            .defaultReviewerGroups(reverseOverlay(bottom.getDefaultReviewerGroups(), top.getDefaultReviewerGroups()))
+            .excludedUsers(reverseOverlay(bottom.getExcludedUsers(), top.getExcludedUsers()))
+            .excludedGroups(reverseOverlay(bottom.getExcludedGroups(), top.getExcludedGroups()))
+            .blockedCommits(reverseOverlay(bottom.getBlockedCommits(), top.getBlockedCommits()))
+            .blockedPRs(reverseOverlay(bottom.getBlockedPRs(), top.getBlockedPRs()))
+            .automergePRs(reverseOverlay(bottom.getAutomergePRs(), top.getAutomergePRs()))
+            .automergePRsFrom(reverseOverlay(bottom.getAutomergePRsFrom(), top.getAutomergePRsFrom()))
+            .requiredReviewExclude(reverseOverlay(bottom.getRequiredReviewExclude(), top.getRequiredReviewExclude()))
+            .requiredReviewExcludeGroups(reverseOverlay(bottom.getRequiredReviewExcludeGroups(), top.getRequiredReviewExcludeGroups()))
         .build();
   }
 

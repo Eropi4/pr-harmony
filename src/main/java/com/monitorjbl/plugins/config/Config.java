@@ -21,6 +21,8 @@ public class Config {
   private List<String> automergePRsFrom = newArrayList();
   private List<String> excludedUsers = newArrayList();
   private List<String> excludedGroups = newArrayList();
+  private List<String> requiredReviewExclude = newArrayList();
+  private List<String> requiredReviewExcludeGroups = newArrayList();
 
   public Config() {
   }
@@ -37,6 +39,8 @@ public class Config {
     setAutomergePRsFrom(builder.automergePRsFrom);
     setExcludedUsers(builder.excludedUsers);
     setExcludedGroups(builder.excludedGroups);
+    setRequiredReviewExclude(builder.requiredReviewExclude);
+    setRequiredReviewExcludeGroups(builder.requiredReviewExcludeGroups);
   }
 
   public List<String> getDefaultReviewers() {
@@ -127,6 +131,22 @@ public class Config {
     this.excludedGroups = excludedGroups;
   }
 
+  public List<String> getRequiredReviewExclude() {
+    return requiredReviewExclude;
+  }
+
+  public void setRequiredReviewExclude(List<String> requiredReviewExclude) {
+    this.requiredReviewExclude = requiredReviewExclude;
+  }
+
+  public List<String> getRequiredReviewExcludeGroups() {
+    return requiredReviewExcludeGroups;
+  }
+
+  public void setRequiredReviewExcludeGroups(List<String> requiredReviewExcludeGroups) {
+    this.requiredReviewExcludeGroups = requiredReviewExcludeGroups;
+  }
+
   public Builder copyBuilder() {
     return new Builder(this);
   }
@@ -141,6 +161,8 @@ public class Config {
     private List<String> requiredReviewers = newArrayList();
     private List<String> requiredReviewerGroups = newArrayList();
     private Integer requiredReviews = 0;
+    private List<String> requiredReviewExclude = newArrayList();
+    private List<String> requiredReviewExcludeGroups = newArrayList();
     private List<String> blockedCommits = newArrayList();
     private List<String> blockedPRs = newArrayList();
     private List<String> automergePRs = newArrayList();
@@ -163,6 +185,8 @@ public class Config {
       automergePRsFrom = newArrayList(copy.automergePRsFrom);
       excludedUsers = newArrayList(copy.excludedUsers);
       excludedGroups = newArrayList(copy.excludedGroups);
+      requiredReviewExclude = newArrayList(copy.requiredReviewExclude);
+      requiredReviewExcludeGroups = newArrayList(copy.requiredReviewExcludeGroups);
     }
 
     public Builder defaultReviewers(List<String> defaultReviewers) {
@@ -182,6 +206,16 @@ public class Config {
 
     public Builder requiredReviewerGroups(List<String> requiredReviewerGroups) {
       this.requiredReviewerGroups = requiredReviewerGroups;
+      return this;
+    }
+
+    public Builder requiredReviewExclude(List<String> requiredReviewExclude) {
+      this.requiredReviewExclude = requiredReviewExclude;
+      return this;
+    }
+
+    public Builder requiredReviewExcludeGroups(List<String> requiredReviewExcludeGroups) {
+      this.requiredReviewExcludeGroups = requiredReviewExcludeGroups;
       return this;
     }
 

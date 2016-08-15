@@ -2,6 +2,7 @@ package com.monitorjbl.plugins;
 
 import com.atlassian.bitbucket.pull.PullRequest;
 import com.atlassian.bitbucket.pull.PullRequestParticipant;
+import com.atlassian.bitbucket.user.ApplicationUser;
 import com.google.common.base.Function;
 import com.monitorjbl.plugins.config.Config;
 
@@ -22,6 +23,15 @@ public class PullRequestApproval {
   public PullRequestApproval(Config config, UserUtils utils) {
     this.config = config;
     this.utils = utils;
+  }
+
+  public boolean isPullRequestApproved(PullRequest pr, ApplicationUser applicationUser) {
+    Set<String> excludedUsers = newHashSet(concat(config.getRequiredReviewExclude(), utils.dereferenceGroups(config.getRequiredReviewExcludeGroups())));
+    if(excludedUsers.contains(applicationUser.getSlug())) {
+      return true;
+    }
+
+    return isPullRequestApproved(pr);
   }
 
   public boolean isPullRequestApproved(PullRequest pr) {

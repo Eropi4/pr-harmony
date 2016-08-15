@@ -24,7 +24,9 @@
       blockedCommits: $('#blockedCommits').val().split(','),
       blockedPRs: $('#blockedPRs').val().split(','),
       automergePRs: $('#automergePRs').val().split(','),
-      automergePRsFrom: $('#automergePRsFrom').val().split(',')
+      automergePRsFrom: $('#automergePRsFrom').val().split(','),
+      requiredReviewExclude: $('#requiredReviewExclude').val().split(','),
+      requiredReviewExcludeGroups: $('#requiredReviewExcludeGroups').val().split(',')
     });
     log('Uploading configuration', post);
 
@@ -59,14 +61,18 @@
         $('#blockedPRs').val(config.blockedPRs);
         $('#automergePRs').val(config.automergePRs);
         $('#automergePRsFrom').val(config.automergePRsFrom);
+        $('#requiredReviewExclude').val(config.requiredReviewExclude);
+        $('#requiredReviewExcludeGroups').val(config.requiredReviewExcludeGroups);
 
         //initialize selections
         userSelection("#defaultReviewers");
         userSelection("#requiredReviewers");
         userSelection("#excludedUsers");
+        userSelection("#requiredReviewExclude");
         groupSelection("#defaultReviewerGroups");
         groupSelection("#requiredReviewerGroups");
         groupSelection("#excludedGroups");
+        groupSelection("#requiredReviewExcludeGroups");
       }
     });
   }
